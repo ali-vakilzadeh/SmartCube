@@ -16,10 +16,10 @@ The primary goals of Smart Cubes are:
 
 The Smart Cubes technology stack consists of:
 
-* **Frontend**: React.js, a popular JavaScript library for building user interfaces
-* **Backend**: Node.js, a JavaScript runtime environment for building server-side applications
-* **Database**: MongoDB, a NoSQL database for storing user data, workflows, and cube configurations
-* **AI API Integrations**: OpenRouter, Google Cloud AI, and Microsoft Azure AI (selectable by developer at production stage through project configuration settings)
+* **Frontend**: React.js, for building user interfaces
+* **Backend**: Node.js, for building server-side applications
+* **Database**: MongoDB, for storing user data, workflows, and cube configurations
+* **AI API Integrations**: OpenRouter, Google Cloud AI, and Microsoft Azure AI
 
 ## IV. System Architecture
 
@@ -51,9 +51,9 @@ The Smart Cubes user experience will be designed to be intuitive and user-friend
 
 The Smart Cubes system will integrate with the following AI APIs:
 
-* **OpenRouter**: A cloud-based AI API for executing tasks and retrieving results.
-* **Google Cloud AI**: A cloud-based AI API for executing tasks and retrieving results.
-* **Microsoft Azure AI**: A cloud-based AI API for executing tasks and retrieving results.
+* **OpenRouter**
+* **Google Cloud AI**
+* **Microsoft Azure AI**
 
 ## VIII. Scalability and Performance
 
@@ -107,4 +107,4 @@ Here are the tech stack details:
 
 * **MongoDB**: Version 5.0.0
 
-This completes the Smart Cubes project description and tech stack. Please review and let me know if you have any further questions or concerns.
+
