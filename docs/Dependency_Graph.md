@@ -1,3 +1,9 @@
+
+---
+
+# 🧩 Smart Cubes MVP — ASCII Dependency Graph
+
+```
 ┌───────────────────────────────────────────────────────────────────────────┐
 │                              FRONTEND (P5)                               │
 │───────────────────────────────────────────────────────────────────────────│
@@ -81,3 +87,54 @@
 │                                                                           │
 │ These are pure functions or stateless helpers used by all upper layers.   │
 └───────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+# 🧠 Layer Relationships (Summary)
+
+| Layer                         | Depends On | Used By                            |
+| ----------------------------- | ---------- | ---------------------------------- |
+| **P1 — Utilities**            | —          | All higher layers                  |
+| **P2 — Infrastructure**       | P1         | Cubes, Scheduler, Workflow modules |
+| **P3 — Cubes**                | P1, P2     | Cube Executor, Scheduler           |
+| **P4 — Runtime Control**      | P1–P3      | Frontend Streamer, API routes      |
+| **P5 — Frontend & Interface** | P4         | End-users / UI                     |
+
+---
+
+# 🧭 Practical Code Generation Order (Visual Flow)
+
+```
+(1)  Utilities  →  (2) Infrastructure  →  (3) Cube Library  →  (4) Runtime  →  (5) Frontend
+   |                    |                      |                     |                 |
+   |                    |                      |                     |                 |
+   V                    V                      V                     V                 V
+[Validator]     [Auth, AI Adapter]      [Text Cube, Saver]      [Scheduler]     [Terminal / UI]
+```
+
+---
+
+# ⚙️ How to Use This for Copilot Prompting
+
+When generating code with Copilot:
+
+1. **Start with Priority 1** modules — define them as pure utilities first.
+   *Prompt example:*
+
+   > “Generate a JavaScript module `typeValidator.js` that exports `validateType(input, expectedType)` returning true/false.”
+
+2. **Then move to Priority 2** (Auth, Logger, AI Adapter).
+   *Prompt example:*
+
+   > “Generate an `aiAdapter.js` module that calls AI providers using axios. Use anonymizer and timeout watchdog.”
+
+3. **Generate Cube Modules (Priority 3)** once infrastructure is done.
+   Each cube file can import the utilities and AI Adapter.
+
+4. **Implement Runtime (Priority 4)** — Scheduler, Executor, Execution Manager.
+   These will orchestrate all cube calls and handle loop enforcement.
+
+5. **Finally build the UI (Priority 5)** — once backend endpoints and logs are functional.
+
+
