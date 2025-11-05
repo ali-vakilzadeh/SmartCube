@@ -1,5 +1,7 @@
 /backend
+
   /modules
+  
     auth.js
     admin.js
     workflow.js
@@ -15,13 +17,19 @@
     analytics.js
     logger.js
     anonymizer.js
+    
   /middleware
+  
     accessControl.js
     anonymize.js
+    
   /routes
+  
     authRoutes.js
     workflowRoutes.js
     executionRoutes.js
+    
   /utils
+  
     typeValidator.js
     outputFormatter.js
