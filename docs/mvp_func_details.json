@@ -1,0 +1,343 @@
+{
+  "SmartCubes_MVP": {
+    "priority_1": {
+      "data_type_validator": {
+        "dependencies": [],
+        "inputs": [
+          { "name": "input", "type": "any", "required": true },
+          { "name": "expectedType", "type": "string", "required": true }
+        ],
+        "outputs": [
+          { "name": "isValid", "type": "boolean" }
+        ],
+        "file_path": "backend/utils/typeValidator.js",
+        "description": "Checks if the provided input matches the expected data type. Returns true or false. Used before cube execution to prevent incompatible data flow."
+      },
+      "output_formatter": {
+        "dependencies": [],
+        "inputs": [
+          { "name": "rawOutput", "type": "any", "required": true },
+          { "name": "type", "type": "string", "required": true }
+        ],
+        "outputs": [
+          { "name": "formattedOutput", "type": "object|string|number" }
+        ],
+        "file_path": "backend/utils/outputFormatter.js",
+        "description": "Standardizes AI or cube outputs (e.g., converts to text, JSON, image blob). Returns formatted data compatible with downstream cubes."
+      },
+      "loop_controller": {
+        "dependencies": [],
+        "inputs": [
+          { "name": "currentIteration", "type": "number", "required": true },
+          { "name": "maxIterations", "type": "number", "required": true }
+        ],
+        "outputs": [
+          { "name": "canContinue", "type": "boolean" }
+        ],
+        "file_path": "backend/utils/loopController.js",
+        "description": "Checks if another iteration of a workflow loop can proceed. Returns true if allowed, false if limit reached."
+      },
+      "token_manager": {
+        "dependencies": ["jwt"],
+        "inputs": [
+          { "name": "userId", "type": "string", "required": true }
+        ],
+        "outputs": [
+          { "name": "token", "type": "string" },
+          { "name": "expiry", "type": "datetime" }
+        ],
+        "file_path": "backend/utils/tokenManager.js",
+        "description": "Generates and validates JWT tokens for user authentication. Provides signed token and expiration timestamp."
+      },
+      "anonymization_middleware": {
+        "dependencies": ["regex", "tokenizer"],
+        "inputs": [
+          { "name": "inputData", "type": "string|object", "required": true }
+        ],
+        "outputs": [
+          { "name": "cleanData", "type": "string|object" }
+        ],
+        "file_path": "backend/middleware/anonymize.js",
+        "description": "Removes personally identifiable information and sensitive terms before AI API calls. Returns cleaned data object."
+      },
+      "ai_timeout_watchdog": {
+        "dependencies": ["node_timer"],
+        "inputs": [
+          { "name": "requestId", "type": "string", "required": true },
+          { "name": "timeout", "type": "number", "required": true }
+        ],
+        "outputs": [
+          { "name": "status", "type": "string", "values": ["ok", "timeout"] }
+        ],
+        "file_path": "backend/utils/aiTimeoutWatchdog.js",
+        "description": "Monitors an active AI API call. Returns 'timeout' if exceeded, otherwise 'ok'. Used to halt stalled cube executions."
+      }
+    },
+    "priority_2": {
+      "error_handler": {
+        "dependencies": ["output_formatter", "mongodb"],
+        "inputs": [
+          { "name": "error", "type": "object", "required": true },
+          { "name": "executionId", "type": "string", "required": true }
+        ],
+        "outputs": [
+          { "name": "status", "type": "string", "values": ["halted", "logged"] }
+        ],
+        "file_path": "backend/modules/errorHandler.js",
+        "description": "Centralized error management. Logs error details to MongoDB, formats messages, and halts workflow execution. Returns status for audit."
+      },
+      "analytics_logger": {
+        "dependencies": ["mongodb"],
+        "inputs": [
+          { "name": "eventType", "type": "string", "required": true },
+          { "name": "meta", "type": "object", "required": false },
+          { "name": "userId", "type": "string", "required": true }
+        ],
+        "outputs": [
+          { "name": "logId", "type": "string" }
+        ],
+        "file_path": "backend/modules/analyticsLogger.js",
+        "description": "Stores user actions, system events, and timing data for analytics. Returns unique log ID on success."
+      },
+      "access_control_middleware": {
+        "dependencies": ["token_manager"],
+        "inputs": [
+          { "name": "token", "type": "string", "required": true },
+          { "name": "requiredRole", "type": "string", "required": false }
+        ],
+        "outputs": [
+          { "name": "authorized", "type": "boolean" }
+        ],
+        "file_path": "backend/middleware/accessControl.js",
+        "description": "Validates JWT token and ensures user has appropriate role. Returns true if authorized, false if blocked."
+      },
+      "auth_module": {
+        "dependencies": ["token_manager", "bcrypt", "mongodb"],
+        "inputs": [
+          { "name": "email", "type": "string", "required": true },
+          { "name": "password", "type": "string", "required": true }
+        ],
+        "outputs": [
+          { "name": "token", "type": "string" },
+          { "name": "status", "type": "string", "values": ["success", "fail", "error"] }
+        ],
+        "file_path": "backend/modules/auth.js",
+        "description": "Handles registration and login. Verifies password, issues JWT token, and returns status of the operation."
+      },
+      "admin_management_module": {
+        "dependencies": ["auth_module", "access_control_middleware", "mongodb"],
+        "inputs": [
+          { "name": "adminToken", "type": "string", "required": true },
+          { "name": "action", "type": "string", "required": true },
+          { "name": "targetUserId", "type": "string", "required": true }
+        ],
+        "outputs": [
+          { "name": "result", "type": "string", "values": ["success", "error", "unauthorized"] }
+        ],
+        "file_path": "backend/modules/admin.js",
+        "description": "Performs admin-level actions like password reset and account deletion. Validates access, executes DB update, returns result."
+      },
+      "ai_adapter": {
+        "dependencies": ["anonymization_middleware", "ai_timeout_watchdog", "axios"],
+        "inputs": [
+          { "name": "prompt", "type": "string", "required": true },
+          { "name": "inputs", "type": "object", "required": false },
+          { "name": "provider", "type": "string", "required": false }
+        ],
+        "outputs": [
+          { "name": "aiResponse", "type": "string|object|image" },
+          { "name": "status", "type": "string", "values": ["success", "timeout", "error"] }
+        ],
+        "file_path": "backend/modules/aiAdapter.js",
+        "description": "Formats and sends AI API requests to selected provider. Anonymizes inputs, monitors timeout, and returns structured response."
+      }
+    },
+    "priority_3": {
+      "loader_cubes": {
+        "dependencies": ["data_type_validator", "output_formatter"],
+        "inputs": [
+          { "name": "sourceData", "type": "any", "required": true }
+        ],
+        "outputs": [
+          { "name": "output", "type": "text|json|image" }
+        ],
+        "file_path": "backend/cubes/loaderCubes.js",
+        "description": "Initializes workflow data. Converts uploaded text, JSON, or image files into a usable format."
+      },
+      "recognition_cubes": {
+        "dependencies": ["ai_adapter", "output_formatter"],
+        "inputs": [
+          { "name": "inputData", "type": "image|audio", "required": true }
+        ],
+        "outputs": [
+          { "name": "output", "type": "string|json" }
+        ],
+        "file_path": "backend/cubes/recognitionCubes.js",
+        "description": "Recognizes content in image or audio inputs via AI (e.g., OCR or speech-to-text). Returns recognized text or structured JSON."
+      },
+      "math_cube": {
+        "dependencies": ["mathjs"],
+        "inputs": [
+          { "name": "expression", "type": "string", "required": true }
+        ],
+        "outputs": [
+          { "name": "result", "type": "number" }
+        ],
+        "file_path": "backend/cubes/mathCube.js",
+        "description": "Evaluates numeric expressions safely using math.js. Returns calculated result or error."
+      },
+      "decider_cube": {
+        "dependencies": ["data_type_validator", "output_formatter"],
+        "inputs": [
+          { "name": "input", "type": "any", "required": true },
+          { "name": "condition", "type": "string", "required": true }
+        ],
+        "outputs": [
+          { "name": "decision", "type": "boolean" }
+        ],
+        "file_path": "backend/cubes/deciderCube.js",
+        "description": "Performs logical or text-based decision making (e.g., 'if text contains keyword'). Returns boolean decision for branching."
+      },
+      "text_cube": {
+        "dependencies": ["ai_adapter", "output_formatter"],
+        "inputs": [
+          { "name": "prompt", "type": "string", "required": true },
+          { "name": "inputs", "type": "text|json", "required": false }
+        ],
+        "outputs": [
+          { "name": "output", "type": "string" }
+        ],
+        "file_path": "backend/cubes/textCube.js",
+        "description": "Sends user prompt and optional text input to AI. Returns generated or transformed text."
+      },
+      "image_cube": {
+        "dependencies": ["ai_adapter", "output_formatter"],
+        "inputs": [
+          { "name": "prompt", "type": "string", "required": true }
+        ],
+        "outputs": [
+          { "name": "output", "type": "image|blob" }
+        ],
+        "file_path": "backend/cubes/imageCube.js",
+        "description": "Generates images based on user prompt using AI provider. Returns image blob or URL."
+      },
+      "saver_cubes": {
+        "dependencies": ["fs_s3_sdk", "data_type_validator", "output_formatter"],
+        "inputs": [
+          { "name": "input", "type": "text|image|json|table", "required": true },
+          { "name": "destination", "type": "string", "required": true }
+        ],
+        "outputs": [
+          { "name": "filePath", "type": "string" },
+          { "name": "status", "type": "string", "values": ["saved", "error", "invalid_type"] }
+        ],
+        "file_path": "backend/cubes/saverCubes.js",
+        "description": "Persists cube output to disk or cloud storage. Validates data type and returns path or error."
+      }
+    },
+    "priority_4": {
+      "cube_executor": {
+        "dependencies": [
+          "loader_cubes",
+          "recognition_cubes",
+          "math_cube",
+          "decider_cube",
+          "text_cube",
+          "image_cube",
+          "saver_cubes",
+          "data_type_validator",
+          "output_formatter"
+        ],
+        "inputs": [
+          { "name": "cube", "type": "object", "required": true },
+          { "name": "inputs", "type": "object", "required": true }
+        ],
+        "outputs": [
+          { "name": "output", "type": "any" },
+          { "name": "status", "type": "string", "values": ["success", "fail", "error"] }
+        ],
+        "file_path": "backend/modules/cubeExecutor.js",
+        "description": "Executes a cube based on its type. Calls the appropriate cube handler, validates inputs, and routes outputs to the scheduler."
+      },
+      "scheduler": {
+        "dependencies": ["cube_executor", "loop_controller", "error_handler", "analytics_logger"],
+        "inputs": [
+          { "name": "workflow", "type": "object", "required": true },
+          { "name": "executionId", "type": "string", "required": true }
+        ],
+        "outputs": [
+          { "name": "executionResult", "type": "object" }
+        ],
+        "file_path": "backend/modules/scheduler.js",
+        "description": "Sequentially executes cubes according to workflow graph. Manages loop iterations, logs execution, halts on first error."
+      },
+      "execution_manager": {
+        "dependencies": ["scheduler", "analytics_logger", "mongodb"],
+        "inputs": [
+          { "name": "workflowId", "type": "string", "required": true },
+          { "name": "userId", "type": "string", "required": true }
+        ],
+        "outputs": [
+          { "name": "executionId", "type": "string" },
+          { "name": "status", "type": "string", "values": ["running", "completed", "error"] }
+        ],
+        "file_path": "backend/modules/executionManager.js",
+        "description": "Manages full lifecycle of workflow execution. Initializes records, invokes scheduler, monitors completion, and logs analytics."
+      },
+      "workflow_validator": {
+        "dependencies": ["data_type_validator", "loop_controller"],
+        "inputs": [
+          { "name": "workflow", "type": "object", "required": true }
+        ],
+        "outputs": [
+          { "name": "validationResult", "type": "boolean" },
+          { "name": "errors", "type": "array" }
+        ],
+        "file_path": "backend/modules/workflowValidator.js",
+        "description": "Verifies structural and logical integrity of workflows before execution (connections, loops, types)."
+      },
+      "workflow_crud_module": {
+        "dependencies": ["workflow_validator", "mongodb"],
+        "inputs": [
+          { "name": "userId", "type": "string", "required": true },
+          { "name": "workflowData", "type": "object", "required": false },
+          { "name": "workflowId", "type": "string", "required": false }
+        ],
+        "outputs": [
+          { "name": "workflow", "type": "object" }
+        ],
+        "file_path": "backend/modules/workflowCRUD.js",
+        "description": "Handles creation, reading, updating, and deletion of workflows in the database. Ensures valid structure before saving."
+      }
+    },
+    "priority_5": {
+      "terminal_log_streamer": {
+        "dependencies": ["scheduler", "execution_manager", "websocket_sse"],
+        "inputs": [
+          { "name": "executionId", "type": "string", "required": true }
+        ],
+        "outputs": [
+          { "name": "logEvent", "type": "object" }
+        ],
+        "file_path": "backend/modules/terminalStreamer.js",
+        "description": "Streams live execution logs and AI outputs to the frontend terminal via WebSocket or SSE."
+      },
+      "analytics_dashboard": {
+        "dependencies": ["analytics_logger"],
+        "inputs": [],
+        "outputs": [
+          { "name": "dashboardData", "type": "object" }
+        ],
+        "file_path": "frontend/modules/analyticsDashboard.js",
+        "description": "Aggregates analytics from backend logs and displays key performance metrics to the admin or user."
+      },
+      "frontend_workflow_editor": {
+        "dependencies": ["workflow_crud_module", "execution_manager", "terminal_log_streamer"],
+        "inputs": [],
+        "outputs": [],
+        "file_path": "frontend/pages/workflowEditor.jsx",
+        "description": "Provides visual drag-and-drop canvas for creating and executing workflows. Integrates CRUD, execution, and live log streaming."
+      }
+    }
+  }
+}
