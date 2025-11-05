@@ -1,0 +1,132 @@
+{
+  "SmartCubes_MVP": {
+    "priority_1": {
+      "data_type_validator": {
+        "dependencies": [],
+        "description": "Validates data type compatibility between cubes (e.g., text -> image disallowed)."
+      },
+      "output_formatter": {
+        "dependencies": [],
+        "description": "Converts raw outputs into standardized form for the next cube."
+      },
+      "loop_controller": {
+        "dependencies": [],
+        "description": "Manages and enforces maximum loop iterations per workflow (2 in MVP)."
+      },
+      "token_manager": {
+        "dependencies": ["jwt"],
+        "description": "Generates and validates JWT tokens for authentication."
+      },
+      "anonymization_middleware": {
+        "dependencies": ["regex", "tokenizer"],
+        "description": "Sanitizes user data before sending to AI APIs (removes personal info)."
+      },
+      "ai_timeout_watchdog": {
+        "dependencies": ["node_timer"],
+        "description": "Monitors ongoing AI API calls and triggers timeout errors."
+      }
+    },
+    "priority_2": {
+      "error_handler": {
+        "dependencies": ["output_formatter", "mongodb"],
+        "description": "Logs and handles execution errors, halting workflows safely."
+      },
+      "analytics_logger": {
+        "dependencies": ["mongodb"],
+        "description": "Records execution and user analytics data for debugging and usage stats."
+      },
+      "access_control_middleware": {
+        "dependencies": ["token_manager"],
+        "description": "Authorizes user and admin access based on JWT tokens."
+      },
+      "auth_module": {
+        "dependencies": ["token_manager", "bcrypt", "mongodb"],
+        "description": "Handles registration, login, password hashing, and token generation."
+      },
+      "admin_management_module": {
+        "dependencies": ["auth_module", "access_control_middleware", "mongodb"],
+        "description": "Performs administrative actions (password reset, account deletion)."
+      },
+      "ai_adapter": {
+        "dependencies": ["anonymization_middleware", "ai_timeout_watchdog", "axios"],
+        "description": "Sends prompts to external AI APIs and returns the processed output."
+      }
+    },
+    "priority_3": {
+      "loader_cubes": {
+        "dependencies": ["data_type_validator", "output_formatter"],
+        "description": "Loads text, JSON, or image data as initial workflow input."
+      },
+      "recognition_cubes": {
+        "dependencies": ["ai_adapter", "output_formatter"],
+        "description": "Performs image or audio recognition via AI APIs."
+      },
+      "math_cube": {
+        "dependencies": ["mathjs"],
+        "description": "Evaluates mathematical expressions safely."
+      },
+      "decider_cube": {
+        "dependencies": ["data_type_validator", "output_formatter"],
+        "description": "Evaluates logical conditions or text rules for branching."
+      },
+      "text_cube": {
+        "dependencies": ["ai_adapter", "output_formatter"],
+        "description": "Uses AI to generate or transform text from user prompt."
+      },
+      "image_cube": {
+        "dependencies": ["ai_adapter", "output_formatter"],
+        "description": "Generates an image using AI based on user prompt."
+      },
+      "saver_cubes": {
+        "dependencies": ["fs_s3_sdk", "data_type_validator", "output_formatter"],
+        "description": "Saves cube outputs (text, image, table, JSON) to storage."
+      }
+    },
+    "priority_4": {
+      "cube_executor": {
+        "dependencies": [
+          "loader_cubes",
+          "recognition_cubes",
+          "math_cube",
+          "decider_cube",
+          "text_cube",
+          "image_cube",
+          "saver_cubes",
+          "data_type_validator",
+          "output_formatter"
+        ],
+        "description": "Delegates cube execution by type; routes inputs/outputs between cubes."
+      },
+      "scheduler": {
+        "dependencies": ["cube_executor", "loop_controller", "error_handler", "analytics_logger"],
+        "description": "Runs cubes sequentially; manages loops and halts on error."
+      },
+      "execution_manager": {
+        "dependencies": ["scheduler", "analytics_logger", "mongodb"],
+        "description": "Coordinates workflow execution; initializes, monitors, and finalizes runs."
+      },
+      "workflow_validator": {
+        "dependencies": ["data_type_validator", "loop_controller"],
+        "description": "Validates workflow structure, node connections, and loop limits."
+      },
+      "workflow_crud_module": {
+        "dependencies": ["workflow_validator", "mongodb"],
+        "description": "Provides CRUD operations for user workflows and metadata."
+      }
+    },
+    "priority_5": {
+      "terminal_log_streamer": {
+        "dependencies": ["scheduler", "execution_manager", "websocket_sse"],
+        "description": "Streams real-time logs and outputs to frontend terminal window."
+      },
+      "analytics_dashboard": {
+        "dependencies": ["analytics_logger"],
+        "description": "Displays analytics and usage metrics on frontend."
+      },
+      "frontend_workflow_editor": {
+        "dependencies": ["workflow_crud_module", "execution_manager", "terminal_log_streamer"],
+        "description": "Provides visual drag-and-drop interface for building and running workflows."
+      }
+    }
+  }
+}
