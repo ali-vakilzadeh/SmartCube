@@ -1,124 +1,27 @@
-**Module List and Function Definitions**
-
-Here is an extended list of modules and functions required to build the Smart Cubes MVP production:
-
-### Module: core.js
-Core web service controller that creates the user interface.
-
-#### Functions:
-
-1. **init_page** (inputs: `browser_set` (object), `cookie_reader` (function)) : `void` ==> creates the initial user interface in the web browser.
-	* Dependencies: `user_login` (username, session_number) from `auth.js`, `Node.js`, `React.js`
-2. **render_canvas** (inputs: `workflow_data` (object)) : `React.Component` ==> renders the drag-and-drop canvas for creating workflows.
-	* Dependencies: `Node.js`, `React.js`, `workflow.js`
-3. **handle_user_input** (inputs: `user_input` (string)) : `void` ==> handles user input and updates the workflow data.
-	* Dependencies: `Node.js`, `workflow.js`
-4. **render_workflow_list** (inputs: `workflow_list` (array)) : `React.Component` ==> renders the list of workflows.
-	* Dependencies: `Node.js`, `React.js`, `workflow.js`
-5. **handle_workflow_delete** (inputs: `workflow_id` (string)) : `void` ==> handles workflow deletion.
-	* Dependencies: `Node.js`, `workflow.js`
-
-### Module: auth.js
-Authentication module for user login and session management.
-
-#### Functions:
-
-1. **user_login** (inputs: `username` (string), `password` (string)) : `session_number` (string) ==> authenticates the user and returns a session number.
-	* Dependencies: `Node.js`, `bcrypt` (password hashing library)
-2. **session_management** (inputs: `session_number` (string)) : `void` ==> manages user sessions and updates session data.
-	* Dependencies: `Node.js`, `express-session` (session management library)
-3. **user_registration** (inputs: `username` (string), `email` (string), `password` (string)) : `void` ==> registers a new user.
-	* Dependencies: `Node.js`, `bcrypt` (password hashing library)
-4. **password_reset** (inputs: `username` (string), `new_password` (string)) : `void` ==> resets a user's password.
-	* Dependencies: `Node.js`, `bcrypt` (password hashing library)
-
-### Module: workflow.js
-Workflow management module for creating and executing workflows.
-
-#### Functions:
-
-1. **create_workflow** (inputs: `workflow_data` (object)) : `workflow_id` (string) ==> creates a new workflow and returns its ID.
-	* Dependencies: `Node.js`, `mongodb` (database library)
-2. **execute_workflow** (inputs: `workflow_id` (string)) : `void` ==> executes a workflow and updates its status.
-	* Dependencies: `Node.js`, `ai-api.js` (AI API integration library)
-3. **update_workflow_status** (inputs: `workflow_id` (string), `status` (string)) : `void` ==> updates the status of a workflow.
-	* Dependencies: `Node.js`, `mongodb` (database library)
-4. **get_workflow_data** (inputs: `workflow_id` (string)) : `workflow_data` (object) ==> retrieves workflow data.
-	* Dependencies: `Node.js`, `mongodb` (database library)
-5. **delete_workflow** (inputs: `workflow_id` (string)) : `void` ==> deletes a workflow.
-	* Dependencies: `Node.js`, `mongodb` (database library)
-
-### Module: ai-api.js
-AI API integration module for executing tasks and retrieving results.
-
-#### Functions:
-
-1. **execute_task** (inputs: `task_data` (object)) : `task_result` (object) ==> executes a task using an AI API and returns the result.
-	* Dependencies: `Node.js`, `openrouter` (AI API library), `google-cloud-ai` (AI API library), `microsoft-azure-ai` (AI API library)
-2. **get_task_result** (inputs: `task_id` (string)) : `task_result` (object) ==> retrieves the result of a task.
-	* Dependencies: `Node.js`, `mongodb` (database library)
-3. **cancel_task** (inputs: `task_id` (string)) : `void` ==> cancels a task.
-	* Dependencies: `Node.js`, `ai-api.js` (AI API integration library)
-
-### Module: database.js
-Database module for storing and retrieving data.
-
-#### Functions:
-
-1. **connect_to_database** (inputs: `database_url` (string)) : `void` ==> connects to the database.
-	* Dependencies: `Node.js`, `mongodb` (database library)
-2. **store_workflow_data** (inputs: `workflow_data` (object)) : `void` ==> stores workflow data in the database.
-	* Dependencies: `Node.js`, `mongodb` (database library)
-3. **retrieve_workflow_data** (inputs: `workflow_id` (string)) : `workflow_data` (object) ==> retrieves workflow data from the database.
-	* Dependencies: `Node.js`, `mongodb` (database library)
-4. **store_task_data** (inputs: `task_data` (object)) : `void` ==> stores task data in the database.
-	* Dependencies: `Node.js`, `mongodb` (database library)
-5. **retrieve_task_data** (inputs: `task_id` (string)) : `task_data` (object) ==> retrieves task data from the database.
-	* Dependencies: `Node.js`, `mongodb` (database library)
-
-### Module: smartcube.js
-Smart Cube module for creating and managing Smart Cubes.
-
-#### Functions:
-
-1. **create_smart_cube** (inputs: `smart_cube_data` (object)) : `smart_cube_id` (string) ==> creates a new Smart Cube and returns its ID.
-	* Dependencies: `Node.js`, `mongodb` (database library)
-2. **configure_smart_cube** (inputs: `smart_cube_id` (string), `configuration_data` (object)) : `void` ==> configures a Smart Cube.
-	* Dependencies: `Node.js`, `mongodb` (database library)
-3. **execute_smart_cube** (inputs: `smart_cube_id` (string)) : `void` ==> executes a Smart Cube and updates its status.
-	* Dependencies: `Node.js`, `ai-api.js` (AI API integration library)
-
-### Module: notification.js
-Notification module for sending notifications to users.
-
-#### Functions:
-
-1. **send_notification** (inputs: `notification_data` (object)) : `void` ==> sends a notification to a user.
-	* Dependencies: `Node.js`, `nodemailer` (email library)
-2. **get_notification_preferences** (inputs: `user_id` (string)) : `notification_preferences` (object) ==> retrieves a user's notification preferences.
-	* Dependencies: `Node.js`, `mongodb` (database library)
-
-### Module: analytics.js
-Analytics module for tracking user behavior and workflow execution.
-
-#### Functions:
-
-1. **track_user_behavior** (inputs: `user_id` (string), `behavior_data` (object)) : `void` ==> tracks user behavior.
-	* Dependencies: `Node.js`, `google-analytics` (analytics library)
-2. **track_workflow_execution** (inputs: `workflow_id` (string), `execution_data` (object)) : `void` ==> tracks workflow execution.
-	* Dependencies: `Node.js`, `mongodb` (database library)
-
-### Libraries to be loaded from external sources:
-
-* `Node.js`
-* `React.js`
-* `mongodb` (database library)
-* `bcrypt` (password hashing library)
-* `express-session` (session management library)
-* `openrouter` (AI API library)
-* `google-cloud-ai` (AI API library)
-* `microsoft-azure-ai` (AI API library)
-* `nodemailer` (email library)
-* `google-analytics` (analytics library)
-
-This extended list includes additional functions for workflow management, AI API integration, database storage and retrieval, Smart Cube creation and execution, notification sending, and analytics tracking.
+| #      | Module / Function                          | Inputs                                                                                                        | Outputs                                              | Dependencies                                 | Description                                                                                           |
+| ------ | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- | -------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| **1**  | **User Authentication Module**             | `email` (string, required), `password` (string, required)                                                     | `token` (JWT string), `status` (bool)                | bcrypt (hash), JWT, MongoDB                  | Handles user registration/login. Verifies credentials, generates JWT token, manages sessions.         |
+| **2**  | **Admin Management Module**                | `adminToken` (string, required), `action` (string, required: "reset" / "delete"), `userId` (string, required) | `result` (string: "success"/"error")                 | JWT middleware, MongoDB                      | Allows admin to reset user password or delete accounts. Only accessible to admin role.                |
+| **3**  | **Workflow CRUD Module**                   | `userId` (string, required), `workflowData` (object, optional), `workflowId` (string, optional)               | `workflow` (object)                                  | MongoDB                                      | Create, read, update, delete workflows. Stores node list, connections, and metadata.                  |
+| **4**  | **Workflow Validator**                     | `workflow` (object, required)                                                                                 | `validationResult` (bool), `errors` (array)          | None                                         | Ensures workflow nodes are valid, all connections map correctly, no loops beyond allowed limit.       |
+| **5**  | **Execution Manager**                      | `workflowId` (string, required), `userId` (string, required)                                                  | `executionId` (string), `status` ("running"/"error") | Scheduler, MongoDB, Analytics Logger         | Initializes workflow execution. Creates execution record, invokes Scheduler to process cubes.         |
+| **6**  | **Scheduler (In-Memory Queue)**            | `executionId` (string, required), `workflow` (object, required)                                               | `executionResult` (object: status, logs, outputs)    | Node runtime, AI Adapter, Saver Modules      | Sequentially executes cubes by topological order. Stops on error. Manages loop count (max 2).         |
+| **7**  | **Cube Executor (Generic)**                | `cube` (object, required), `inputs` (object, required)                                                        | `output` (any), `status` (string)                    | Cube Library (type dispatch), AI Adapter     | Determines cube type and delegates to the respective handler (loader, AI, saver, etc.).               |
+| **8**  | **AI Adapter**                             | `prompt` (string, required), `inputs` (object, optional), `cubeType` (string, required)                       | `aiResponse` (string / image / json)                 | axios/fetch, OpenRouter / Azure / Google API | Formats request for current AI provider, sends prompt, receives and parses response. Handles timeout. |
+| **9**  | **Anonymization Middleware**               | `inputData` (object/string, required)                                                                         | `cleanData` (object/string)                          | regex / custom tokenization util             | Strips personal data and sensitive terms from user inputs before calling AI APIs.                     |
+| **10** | **Loader Cubes (Text, JSON, Image)**       | `sourceData` (any, required)                                                                                  | `output` (text/json/image)                           | fs / file input / user upload                | Provide initial data for workflow. Converts user uploads into internal data representation.           |
+| **11** | **Recognition Cubes (Seeing, Hearing)**    | `inputData` (image/audio, required)                                                                           | `output` (text / json)                               | OpenAI Vision API / Whisper / local model    | Converts visual/audio input into structured text or JSON (AI-based recognition).                      |
+| **12** | **Math Cube**                              | `expression` (string, required)                                                                               | `result` (number)                                    | math.js                                      | Parses and evaluates a mathematical expression safely (no arbitrary JS eval).                         |
+| **13** | **Decider Cube**                           | `input` (any, required), `condition` (string, required)                                                       | `decision` (bool / branch id)                        | Basic parser                                 | Evaluates simple rule (`input > 10` or `text includes keyword`). Directs workflow branch.             |
+| **14** | **Text Cube**                              | `prompt` (string, required), `inputs` (text/json, optional)                                                   | `output` (string)                                    | AI Adapter                                   | Sends user prompt (plus optional input text) to AI, retrieves text output.                            |
+| **15** | **Image Cube**                             | `prompt` (string, required)                                                                                   | `output` (image blob / URL)                          | AI Adapter                                   | Sends prompt to AI image generation API, retrieves image.                                             |
+| **16** | **Saver Cubes (Text, Image, Table, JSON)** | `input` (text/image/table/json, required), `destination` (string, required)                                   | `filePath` (string), `status` (string)               | fs / S3 SDK                                  | Saves data to persistent storage. Fails if data type incompatible.                                    |
+| **17** | **Error Handler**                          | `error` (object, required), `executionId` (string, required)                                                  | `status` ("halted"), `logEntry` (object)             | MongoDB, Logger                              | Logs the error, halts the current workflow execution, updates analytics.                              |
+| **18** | **Terminal Log Streamer**                  | `executionId` (string, required)                                                                              | `logEvent` (object: time, nodeId, message)           | WebSocket / SSE                              | Streams real-time execution messages and AI outputs to frontend terminal.                             |
+| **19** | **Analytics Logger**                       | `eventType` (string, required), `meta` (object, optional), `userId` (string, required)                        | `logId` (string)                                     | MongoDB                                      | Records system usage (workflow starts, node runs, errors, timestamps).                                |
+| **20** | **AI Timeout Watchdog**                    | `requestId` (string, required), `timeout` (int, required)                                                     | `status` ("ok" / "timeout")                          | Timer / Node events                          | Monitors ongoing AI calls. Triggers error handler if exceeded.                                        |
+| **21** | **Token Manager**                          | `userId` (string, required)                                                                                   | `jwt` (string), `expiry` (datetime)                  | JWT                                          | Generates and validates authentication tokens.                                                        |
+| **22** | **Access Control Middleware**              | `token` (string, required), `requiredRole` (string, optional)                                                 | `authorized` (bool)                                  | JWT verifier                                 | Validates user access level for admin endpoints.                                                      |
+| **23** | **Loop Controller**                        | `currentIteration` (int, required), `maxIterations` (int, required)                                           | `continue` (bool)                                    | Scheduler                                    | Manages and enforces loop execution limits (2 for MVP).                                               |
+| **24** | **Data Type Validator**                    | `input` (any, required), `expectedType` (string, required)                                                    | `valid` (bool)                                       | None                                         | Ensures data type compatibility between cubes (e.g., text → image disallowed).                        |
+| **25** | **Output Formatter**                       | `rawOutput` (any, required), `type` (string, required)                                                        | `formattedOutput` (string/object)                    | None                                         | Converts AI or cube outputs into standardized form for next cube.                                     |
