@@ -17,7 +17,7 @@ SmartCube is a visual workflow builder for creating AI-powered automation workfl
 
 ### 1. Clone or Extract the Project
 
-\`\`\`bash
+```bash
 # If from ZIP
 unzip SmartCubemain.zip
 cd SmartCubemain
@@ -25,13 +25,13 @@ cd SmartCubemain
 # If from Git
 git clone <repository-url>
 cd smartcube
-\`\`\`
+```
 
 ### 2. Install Dependencies
 
-\`\`\`bash
+```bash
 npm install
-\`\`\`
+```
 
 This will install all required packages including:
 - Next.js 16 (React 19)
@@ -45,13 +45,13 @@ This will install all required packages including:
 
 Create a `.env.local` file in the root directory:
 
-\`\`\`bash
+```bash
 cp .env.example .env.local
-\`\`\`
+```
 
 Edit `.env.local` with your configuration:
 
-\`\`\`env
+```env
 # MongoDB Configuration
 MONGODB_URI=mongodb://localhost:27017/smartcube
 # Or use MongoDB Atlas:
@@ -87,13 +87,13 @@ STORAGE_PATH=./storage
 # Application Configuration
 NODE_ENV=development
 PORT=3000
-\`\`\`
+```
 
 ### 4. Set Up MongoDB
 
 #### Option A: Local MongoDB
 
-\`\`\`bash
+```bash
 # Install MongoDB (macOS)
 brew tap mongodb/brew
 brew install mongodb-community
@@ -103,7 +103,7 @@ brew services start mongodb-community
 
 # Verify it's running
 mongosh
-\`\`\`
+```
 
 #### Option B: MongoDB Atlas (Cloud)
 
@@ -115,17 +115,17 @@ mongosh
 
 ### 5. Create Storage Directory
 
-\`\`\`bash
+```bash
 mkdir -p storage
-\`\`\`
+```
 
 This directory will store outputs from Saver Cubes (text files, images, CSVs, JSON).
 
 ### 6. Run the Development Server
 
-\`\`\`bash
+```bash
 npm run dev
-\`\`\`
+```
 
 The application will be available at `http://localhost:3000`
 
@@ -138,7 +138,7 @@ The application will be available at `http://localhost:3000`
 
 ## Project Structure
 
-\`\`\`
+```
 smartcube/
 ├── app/                      # Next.js App Router
 │   ├── api/                  # API routes
@@ -166,7 +166,7 @@ smartcube/
 ├── tests/                   # Test files
 ├── docs/                    # Documentation
 └── storage/                 # Output storage
-\`\`\`
+```
 
 ## Usage Guide
 
@@ -217,30 +217,30 @@ Workflows execute **sequentially** with these rules:
 
 Run the test suite:
 
-\`\`\`bash
+```bash
 npm test
-\`\`\`
+```
 
 Run specific test files:
 
-\`\`\`bash
+```bash
 npm test -- tests/utils.test.ts
 npm test -- tests/cubes.test.ts
 npm test -- tests/engine.test.ts
-\`\`\`
+```
 
 ## Troubleshooting
 
 ### MongoDB Connection Issues
 
-\`\`\`bash
+```bash
 # Check if MongoDB is running
 mongosh
 
 # Check connection string format
 # Should be: mongodb://localhost:27017/smartcube
 # Or: mongodb+srv://user:pass@cluster.mongodb.net/smartcube
-\`\`\`
+```
 
 ### AI Provider Errors
 
@@ -250,20 +250,20 @@ mongosh
 
 ### Port Already in Use
 
-\`\`\`bash
+```bash
 # Change port in .env.local
 PORT=3001
 
 # Or kill the process using port 3000
 lsof -ti:3000 | xargs kill -9
-\`\`\`
+```
 
 ### Storage Permission Issues
 
-\`\`\`bash
+```bash
 # Ensure storage directory has write permissions
 chmod 755 storage
-\`\`\`
+```
 
 ## Production Deployment
 
@@ -278,10 +278,10 @@ Set all production environment variables:
 
 ### Build for Production
 
-\`\`\`bash
+```bash
 npm run build
 npm start
-\`\`\`
+```
 
 ### Recommended Hosting
 
