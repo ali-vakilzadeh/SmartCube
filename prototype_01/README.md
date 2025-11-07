@@ -14,19 +14,24 @@ SmartCube is a powerful visual workflow builder that enables users to create AI-
 
 ## Quick Start
 
-\`\`\`bash
-# Install dependencies
+```bash
+> Install dependencies
+
 npm install
 
-# Configure environment
-cp .env.example .env.local
-# Edit .env.local with your MongoDB URI and AI provider credentials
+> Configure environment
 
-# Run development server
+cp .env.example .env.local
+
+> Edit .env.local with your MongoDB URI and AI provider credentials
+
+> Run development server
+
 npm run dev
 
-# Open http://localhost:3000
-\`\`\`
+> Open http://localhost:3000
+
+```
 
 ## Documentation
 
@@ -54,16 +59,19 @@ npm run dev
 
 ## Testing
 
-\`\`\`bash
-# Run all tests
+``` bash
+> Run all tests
+
 npm test
 
-# Run tests in watch mode
+> Run tests in watch mode
+
 npm test:watch
 
-# Run specific test file
+> Run specific test file
+
 npm test -- tests/utils.test.ts
-\`\`\`
+```
 
 ## Tech Stack
 
@@ -76,7 +84,7 @@ npm test -- tests/utils.test.ts
 
 ## Project Structure
 
-\`\`\`
+```
 smartcube/
 ├── app/              # Next.js pages and API routes
 ├── components/       # React components
@@ -88,7 +96,8 @@ smartcube/
 │   └── utils/       # Utilities
 ├── tests/           # Test files
 └── docs/            # Documentation
-\`\`\`
+
+```
 
 ## Contributing
 
@@ -111,4 +120,4 @@ For issues and questions, please check:
 
 ---
 
-Built with ❤️ using Next.js and React Flow
+Built with ❤️ using [V0.dev](https://www.V0.dev) Next.js and React Flow
